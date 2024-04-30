@@ -1,1 +1,1 @@
-YouTube to mp3 downloader
+YouTube to mp3 downloader, with and without GUI
