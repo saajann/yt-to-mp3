@@ -1,26 +1,48 @@
-import ssl
-
-ssl._create_default_https_context = ssl._create_unverified_context
-from pytube import YouTube
-from moviepy.editor import AudioFileClip
 import os
+from yt_dlp import YoutubeDL
+import tkinter as tk
+from tkinter import messagebox
 
-def download_audio(url, path):
-    yt = YouTube(url)
-    audio = yt.streams.filter(only_audio=True).first()
-    audio_file = audio.download(output_path=path)
-    mp3_file = os.path.splitext(audio_file)[0] + '.mp3'
-    AudioFileClip(audio_file).write_audiofile(mp3_file)
-    os.remove(audio_file)  # remove the original mp4 file
+def download_audio(url):
+    output_path = "/Users/saajan/Desktop/musica" # Replace with you path
+    options = {
+        'format': 'bestaudio/best',
+        'postprocessors': [{
+            'key': 'FFmpegExtractAudio',
+            'preferredcodec': 'mp3',
+            'preferredquality': '192',
+        }],
+        'outtmpl': os.path.join(output_path, '%(title)s.%(ext)s'),
+        'noplaylist': False,  # Allow downloading playlists
+    }
 
-# Prompt the user for the YouTube URL and output path
-url = input("Enter the YouTube URL: ")
+    try:
+        with YoutubeDL(options) as ydl:
+            ydl.download([url])
+        messagebox.showinfo("Success", f"Audio downloaded and saved to {output_path}")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {e}")
 
-default_path = ""  # Set your default path here
+def on_download_button_click():
+    url = url_entry.get()
+    if url:
+        download_audio(url)
+    else:
+        messagebox.showwarning("Input Error", "Please enter a YouTube video or playlist URL")
 
-path = input("Enter the output path (leave blank for default path): ")
-if not path:
-    path = default_path
+# Create the main window
+root = tk.Tk()
+root.title("YouTube to MP3 Downloader")
 
-# Call the download_audio function
-download_audio(url, path)
+# Create and place the URL entry
+url_label = tk.Label(root, text="Enter the YouTube video or playlist URL:")
+url_label.pack(pady=10)
+url_entry = tk.Entry(root, width=50)
+url_entry.pack(pady=5)
+
+# Create and place the download button
+download_button = tk.Button(root, text="Download", command=on_download_button_click)
+download_button.pack(pady=20)
+
+# Run the Tkinter event loop
+root.mainloop()
