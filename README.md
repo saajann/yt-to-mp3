@@ -40,4 +40,4 @@ This is a simple Python application that allows you to download audio from YouTu
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. 
